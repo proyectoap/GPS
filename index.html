@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Registro de Ubicación</title>
+</head>
+<body>
+  <h2>Registro de Ubicación</h2>
+  <button onclick="registrarUbicacion()">Registrar ubicación</button>
+  <p id="estado">Esperando acción...</p>
+
+  <script>
+    function registrarUbicacion() {
+      const estado = document.getElementById("estado");
+      if (!navigator.geolocation) {
+        estado.textContent = "Tu navegador no soporta geolocalización.";
+        return;
+      }
+
+      estado.textContent = "Obteniendo ubicación...";
+
+      navigator.geolocation.getCurrentPosition(function(pos) {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        estado.textContent = `Ubicación: ${lat}, ${lng}`;
+
+        // Enviar a Google Sheets
+        const url = "https://YOUR_SCRIPT_URL_HERE?lat=" + lat + "&lng=" + lng;
+
+        fetch(url)
+          .then(response => response.text())
+          .then(data => {
+            estado.textContent += " → Enviado correctamente";
+          })
+          .catch(error => {
+            estado.textContent += " → Error al enviar";
+          });
+
+      }, function(error) {
+        estado.textContent = "Error al obtener ubicación.";
+      });
+    }
+  </script>
+</body>
+</html>
